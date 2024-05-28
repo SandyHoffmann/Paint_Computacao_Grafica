@@ -4,11 +4,6 @@ from OpenGL.GLUT import *
 from paint.layer import Layer
 from paint.formas.poligono import Poligono
 from lib.coordenadas.getWorldCoords import *
-from paint.estados.estado_desenho import *
-from paint.estados.estado_idle import *
-from paint.estados.estado_selecao import *
-from paint.estados.estado_mover import *
-from paint.estados.estado_mover_ponto import *
 
 left=-10
 right=110
@@ -19,12 +14,12 @@ AREA = 250
 class CanvaPaint(MyCanvasBase):                
 
     layers = [Layer()]
-    estado_desenho = EstadoDesenho()
-    estado_idle = EstadoIdle()
-    estado_selecao = EstadoSelecao()
-    estado_mover = EstadoMover()
+    estado_desenho = 1
+    estado_idle = 2
+    estado_selecao = 3
+    estado_mover = 4
     estado_atual = estado_desenho
-    estado_mover_ponto = EstadoMoverPonto()
+    estado_mover_ponto = 5
 
 
     def InitGL(self):
@@ -57,11 +52,50 @@ class CanvaPaint(MyCanvasBase):
         glLoadIdentity()
 
     def OnMouseDown(self, evt):
-        self.estado_atual.OnMouseDown(self,evt)
+        if self.estado_atual == 1:
+            self.CaptureMouse() 
+            self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
+            
+            self.x, self.y  = getWorldCoords(self.x, self.y , AREA, -AREA, AREA, -AREA)
+            print(f'MOUSEDOWN = x: {self.x}, y:{self.y}')
+            # ! Verifica modo ativo.
+            if (not self.layers[0].formas):
+                self.layers[0].formas = [Poligono(self.x,self.y)]
+            else:
+                self.layers[0].formas[-1].mouseClick(self.x, self.y)
+            self.Refresh(False)
+        elif self.estado_atual == 2:
+            self.CaptureMouse() 
+            self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
+            
+            self.x, self.y  = getWorldCoords(self.x, self.y , AREA, -AREA, AREA, -AREA)
+
+            self.layers[0].formas.append(Poligono(self.x, self.y))
+            estado_atual = 1
+
+        # self.estado_atual.OnMouseDown(self,evt)
 
     def OnMouseMotion(self, evt):
-        self.estado_atual.OnMouseMotion(self,evt)
+        if self.estado_atual == 1:
+           if evt.RightDown():
+                self.layers[0].formas[-1].setPontoTemporario()
+                self.layers[0].formas[-1].draw()
+                self.estado_atual = 2
+                self.Refresh(True)
+                return 
             
+           self.lastx, self.lasty = self.x, self.y
+           self.x, self.y = evt.GetPosition()
+           self.x, self.y  = getWorldCoords(self.x, self.y , AREA, -AREA, AREA, -AREA)
+
+           if (self.layers[0].formas):
+               self.layers[0].formas[-1].mouseMov(self.x, self.y)
+               self.Refresh(False)
+
+
+        elif self.estado_atual == 2:
+            pass
+
     def OnDraw(self):
         # clear color and depth buffers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -92,23 +126,6 @@ class CanvaPaint(MyCanvasBase):
     def setState(self, state):
         match state:
             case "poligono":
-                self.estado_atual = self.estado_desenho
+                self.estado_atual = 1
             case "idle":
-                self.estado_atual = self.estado_idle
-            case "selecao":
-                self.estado_atual = self.estado_selecao
-            case "mover":
-                self.estado_atual = self.estado_mover
-            case "deletar":
-                #implementar deletar
-                for layer in self.layers:
-                    novasFormas = []
-                    for forma in layer.formas:
-                        if not forma.selecionado:
-                            novasFormas.append(forma)
-                    layer.formas = novasFormas
-                self.Refresh(True)
-            case "mover_ponto":
-                self.estado_atual = self.estado_mover_ponto
-            case _:
-                self.estado_atual = self.estado_desenho
+                self.estado_atual = 2

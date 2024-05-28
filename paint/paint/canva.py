@@ -52,7 +52,7 @@ class CanvaPaint(MyCanvasBase):
         glLoadIdentity()
 
     def OnMouseDown(self, evt):
-        if self.estado_atual == 1:
+        if self.estado_atual == self.estado_desenho:
             self.CaptureMouse() 
             self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
             
@@ -64,23 +64,23 @@ class CanvaPaint(MyCanvasBase):
             else:
                 self.layers[0].formas[-1].mouseClick(self.x, self.y)
             self.Refresh(False)
-        elif self.estado_atual == 2:
+        elif self.estado_atual == self.estado_idle:
             self.CaptureMouse() 
             self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
             
             self.x, self.y  = getWorldCoords(self.x, self.y , AREA, -AREA, AREA, -AREA)
 
             self.layers[0].formas.append(Poligono(self.x, self.y))
-            estado_atual = 1
+            self.estado_atual = self.estado_desenho
 
         # self.estado_atual.OnMouseDown(self,evt)
 
     def OnMouseMotion(self, evt):
-        if self.estado_atual == 1:
+        if self.estado_atual == self.estado_desenho:
            if evt.RightDown():
                 self.layers[0].formas[-1].setPontoTemporario()
                 self.layers[0].formas[-1].draw()
-                self.estado_atual = 2
+                self.estado_atual = self.estado_idle
                 self.Refresh(True)
                 return 
             
@@ -93,7 +93,7 @@ class CanvaPaint(MyCanvasBase):
                self.Refresh(False)
 
 
-        elif self.estado_atual == 2:
+        elif self.estado_atual == self.estado_idle:
             pass
 
     def OnDraw(self):
@@ -126,6 +126,6 @@ class CanvaPaint(MyCanvasBase):
     def setState(self, state):
         match state:
             case "poligono":
-                self.estado_atual = 1
+                self.estado_atual = self.estado_desenho
             case "idle":
-                self.estado_atual = 2
+                self.estado_atual = self.estado_idle

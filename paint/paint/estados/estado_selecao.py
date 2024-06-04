@@ -53,3 +53,6 @@ class EstadoSelecao(Estado):
                         if p1[0] == p2[0] or p[0] <= xinters:
                             return True
         return False
+
+    def OnDraw(self, canva):
+        pass

@@ -40,3 +40,7 @@ class EstadoDesenho(Estado):
         if (canva.layers[0].formas):
             canva.layers[0].formas[-1].mouseMov(canva.x, canva.y)
             canva.Refresh(False)
+    
+
+    def OnDraw(self, canva):
+        pass

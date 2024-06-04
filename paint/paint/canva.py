@@ -9,6 +9,7 @@ from paint.estados.estado_idle import *
 from paint.estados.estado_selecao import *
 from paint.estados.estado_mover import *
 from paint.estados.estado_mover_ponto import *
+from paint.estados.estado_transformacao import *
 
 left=-10
 right=110
@@ -25,7 +26,7 @@ class CanvaPaint(MyCanvasBase):
     estado_mover = EstadoMover()
     estado_atual = estado_desenho
     estado_mover_ponto = EstadoMoverPonto()
-
+    estado_transformacao = EstadoTransformacao()
 
     def InitGL(self):
 
@@ -86,7 +87,7 @@ class CanvaPaint(MyCanvasBase):
                 forma.draw()
        
         # glRotatef((self.x - self.lastx) * xScale, 0.0, 1.0, 0.0);
-
+        self.estado_atual.OnDraw(self)
         self.SwapBuffers()
 
     def setState(self, state):
@@ -110,5 +111,9 @@ class CanvaPaint(MyCanvasBase):
                 self.Refresh(True)
             case "mover_ponto":
                 self.estado_atual = self.estado_mover_ponto
+            case "transformacao":
+                self.estado_transformacao.inicializa_malha(self)
+                self.estado_atual = self.estado_transformacao
+
             case _:
                 self.estado_atual = self.estado_desenho

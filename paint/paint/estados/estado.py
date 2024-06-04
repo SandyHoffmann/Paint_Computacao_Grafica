@@ -9,3 +9,6 @@ class Estado(ABC):
     def OnMouseMotion(self, evt):
         pass
 
+    @abstractmethod
+    def OnDraw(self, canva):
+        pass

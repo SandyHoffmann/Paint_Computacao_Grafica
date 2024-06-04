@@ -16,3 +16,6 @@ class EstadoIdle(Estado):
 
     def OnMouseMotion(self, canva, evt): 
         pass
+
+    def OnDraw(self, canva):
+        pass

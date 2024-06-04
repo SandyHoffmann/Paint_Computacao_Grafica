@@ -44,4 +44,5 @@ class EstadoMoverPonto(Estado):
                 formas_selecionadas[indices_ponto_selecionado[0]].pontos[indices_ponto_selecionado[1]] = [canva.x, canva.y]
             canva.Refresh(True)
 
-        
+    def OnDraw(self, canva):
+        pass

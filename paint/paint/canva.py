@@ -10,6 +10,9 @@ from paint.estados.estado_selecao import *
 from paint.estados.estado_mover import *
 from paint.estados.estado_mover_ponto import *
 from paint.estados.estado_transformacao import *
+from paint.estados.estado_rotacao import *
+
+import re
 
 left=-10
 right=110
@@ -27,7 +30,8 @@ class CanvaPaint(MyCanvasBase):
     estado_atual = estado_desenho
     estado_mover_ponto = EstadoMoverPonto()
     estado_transformacao = EstadoTransformacao()
-
+    estado_rotacao = EstadoRotacao()
+    cor_selecionada = (255, 0, 0)
     def InitGL(self):
 
         glutInit(sys.argv)
@@ -91,6 +95,9 @@ class CanvaPaint(MyCanvasBase):
         self.SwapBuffers()
 
     def setState(self, state):
+        print(state)
+        pattern = re.compile(r'^#')
+
         match state:
             case "poligono":
                 self.estado_atual = self.estado_desenho
@@ -111,9 +118,16 @@ class CanvaPaint(MyCanvasBase):
                 self.Refresh(True)
             case "mover_ponto":
                 self.estado_atual = self.estado_mover_ponto
+            case "rotacao":
+                self.estado_atual = self.estado_rotacao
             case "transformacao":
                 self.estado_transformacao.inicializa_malha(self)
                 self.estado_atual = self.estado_transformacao
-
+            
             case _:
-                self.estado_atual = self.estado_desenho
+                print("COLOR")
+                if state[0] == '#':
+                    print(state[1:3], state[3:5], state[5:7])
+                    self.cor_selecionada = (int(state[1:3], 16), int(state[3:5], 16), int(state[5:7], 16)) 
+                    self.estado_desenho.cor_selecionada = self.cor_selecionada
+                self.estado_atual = self.estado_idle

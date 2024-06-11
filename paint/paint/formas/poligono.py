@@ -4,11 +4,12 @@ from OpenGL.GLUT import *
 
 class Poligono(Forma):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, cor_selecionada = (255, 0.0, 0.0)):
         super().__init__(x, y)  # Call the parent class constructor
         self.pontos = [(x, y)]
         self.pontoTemporario=False
         self.baricentro = False
+        self.cor_selecionada = cor_selecionada
 
     def mouseClick(self, x, y):
         self.pontos.append((x, y))
@@ -48,7 +49,7 @@ class Poligono(Forma):
     def draw(self):
         
         glLineWidth(2)
-        glColor3f(1.0, 0.0, 0.0) # definir a cor vermelha
+        glColor3f(self.cor_selecionada[0]/255, self.cor_selecionada[1]/255, self.cor_selecionada[2]/255) # definir a cor vermelha
         if self.pontoTemporario:
             glBegin(GL_LINE_STRIP) # tipo de primitiva que eu quero
         elif self.selecionado:

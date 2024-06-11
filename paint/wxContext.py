@@ -29,6 +29,25 @@ buttons = [
     {'id': wx.NewId(), 'label': '', 'pic': 'MoveToolIcon.192.png', 'value': 'mover_ponto'},
     {'id': wx.NewId(), 'label': '', 'pic': 'IconFourWayArrow.png', 'value': 'transformacao'},
     {'id': wx.NewId(), 'label': '', 'pic': 'RectangleSelectToolIcon+.192.png', 'value': 'selecao+'},
+    {'id': wx.NewId(), 'label': '', 'pic': 'rotate_right.png', 'value': 'rotacao'},
+    {'id': wx.NewId(), 'label': '', 'pic': 'rotate_right.png', 'value': 'rotacao'},
+
+
+]
+
+buttonsColors = [
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#ff0000', 'wxValue': wx.RED},
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#0000ff', 'wxValue': wx.BLUE},
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#00ff00', 'wxValue': wx.GREEN},
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#ffff00', 'wxValue': wx.YELLOW},
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#ff00ff', 'wxValue': wx.Colour(255, 0, 255)},
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#00ffff',   'wxValue': wx.CYAN},
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#a52a2a',  'wxValue': wx.Colour(165, 42, 42)},
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#ffc0cb',   'wxValue': wx.Colour(255, 192, 203)},
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#ffa500', 'wxValue': wx.Colour(255, 165, 0)},
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#800080', 'wxValue': wx.Colour(128, 0, 128)},
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#ffffff',  'wxValue': wx.WHITE},
+    {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#000000',  'wxValue': wx.BLACK},
 
 ]
 
@@ -77,11 +96,23 @@ class ButtonPanel(wx.Panel):
             
             self.Bind(wx.EVT_BUTTON, self.OnButton, btn)
 
+        caixaColors = wx.BoxSizer(wx.HORIZONTAL)
+        for b in buttonsColors:
+            btn = wx.Button(self, b["id"], size=(35,35), style=wx.BU_AUTODRAW)
+            btn.SetWindowStyleFlag(wx.BORDER_DOUBLE)
+            btn.SetBackgroundColour(b["wxValue"])
+            self.Bind(wx.EVT_BUTTON, self.OnButton, btn)
+            caixaColors.Add(btn, 0, wx.ALIGN_CENTER)
+            if (alinhamento % 2 == 0):
+                box.Add(caixaColors, 0, wx.ALIGN_LEFT|wx.ALL, 3)
+                caixaColors = wx.BoxSizer(wx.HORIZONTAL)
 
+            alinhamento+=1
 
         # With this enabled, you see how you can put a GLCanvas on the wx.Panel
         
         boxAbsolute.Add(box, 0, wx.ALIGN_LEFT)
+        boxAbsolute.Add(caixaColors, 0, wx.ALIGN_LEFT)
 
         self.c = CanvaPaint(self)
         self.c.SetMinSize((500, 500))
@@ -108,6 +139,8 @@ class ButtonPanel(wx.Panel):
 
         else:
             canvasClassName = list(filter(lambda x: x['id'] == evt.GetId(), buttons))
+            if len(canvasClassName) == 0:
+                canvasClassName = list(filter(lambda x: x['id'] == evt.GetId(), buttonsColors))
             self.c.setState(canvasClassName[0]["value"])
             # canvasClass = eval(canvasClassName)
             # cx = 0

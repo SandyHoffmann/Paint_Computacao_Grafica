@@ -6,6 +6,10 @@ from lib.coordenadas.getWorldCoords import *
 from paint.formas.poligono import Poligono
 class EstadoDesenho(Estado):
 
+    def __init__(self):
+        super().__init__()
+        self.cor_selecionada = (255, 0, 0)
+
     def OnMouseDown(self, canva, evt):
         canva.CaptureMouse() 
         canva.x, canva.y = canva.lastx, canva.lasty = evt.GetPosition()
@@ -13,8 +17,10 @@ class EstadoDesenho(Estado):
         canva.x, canva.y  = getWorldCoords(canva.x, canva.y , AREA, -AREA, AREA, -AREA)
         print(f'MOUSEDOWN = x: {canva.x}, y:{canva.y}')
         # ! Verifica modo ativo.
+        print(canva.layers[0].formas)
         if (not canva.layers[0].formas):
-            canva.layers[0].formas = [Poligono(canva.x,canva.y)]
+            print(f'self.cor_selecionada = {self.cor_selecionada}')
+            canva.layers[0].formas = [Poligono(canva.x,canva.y, self.cor_selecionada)]
         else:
             canva.layers[0].formas[-1].mouseClick(canva.x, canva.y)
         canva.Refresh(False)

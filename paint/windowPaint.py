@@ -8,11 +8,11 @@ class WindowPaint(MyCanvasBase):
         glViewport(0, 0, 500, 500) # dizendo para ele ocupar a janela toda. Poderia, por exemplo, ocupar somente uma parte.
         glMatrixMode(GL_PROJECTION) # controla os parametros de visualizacao - camera
         glLoadIdentity() #
-        glOrtho(right, left, top, bottom, -1, 1) # profundidade - no meu mundo eu quero ver de qual coordenada a qual coordenada? - left - right - bottom - top - se aumentar os valores diminui o zoom e se aumentar ocorre o inverso - projecao ortogonal
+        # glOrtho(right, left, top, bottom, -1, 1) # profundidade - no meu mundo eu quero ver de qual coordenada a qual coordenada? - left - right - bottom - top - se aumentar os valores diminui o zoom e se aumentar ocorre o inverso - projecao ortogonal
         glMatrixMode(GL_MODELVIEW) # pilha de matrizes de modelo - faz a rotacao, translacao de objetos - move os objetos pelo mundo - operacoes de visualizacao
         glLoadIdentity() 
         glutIdleFunc(showScreen)
-        # funcao motion (drag)
+        # funcao motion (drag)AREA
         glutMotionFunc(mousePos)
         # funcao click
         glutMouseFunc(mouseClick)

@@ -13,7 +13,7 @@ class EstadoSelecao(Estado):
         canva.CaptureMouse() 
         canva.x, canva.y = canva.lastx, canva.lasty = evt.GetPosition()
         
-        canva.x, canva.y  = getWorldCoords(canva.x, canva.y , AREA, -AREA, AREA, -AREA)
+        canva.x, canva.y  = getWorldCoords(canva.x, canva.y , canva.AREA, -canva.AREA, canva.AREA, -canva.AREA)
         
         c = 0
         d = 0

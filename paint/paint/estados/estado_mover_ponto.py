@@ -13,8 +13,8 @@ class EstadoMoverPonto(Estado):
     def OnMouseDown(self, canva, evt):
         canva.CaptureMouse() 
         canva.x, canva.y = canva.lastx, canva.lasty = evt.GetPosition()
-        print(AREA)
-        canva.x, canva.y  = getWorldCoords(canva.x, canva.y , AREA, -AREA, AREA, -AREA)
+        print(canva.AREA)
+        canva.x, canva.y  = getWorldCoords(canva.x, canva.y , canva.AREA, -canva.AREA, canva.AREA, -canva.AREA)
         pontos_formatados = [0,0]
 
 
@@ -35,7 +35,7 @@ class EstadoMoverPonto(Estado):
     def OnMouseMotion(self, canva, evt): 
         if evt.Dragging() and evt.LeftIsDown():
             canva.x, canva.y = canva.lastx, canva.lasty = evt.GetPosition()
-            canva.x, canva.y  = getWorldCoords(canva.x, canva.y , AREA, -AREA, AREA, -AREA)
+            canva.x, canva.y  = getWorldCoords(canva.x, canva.y , canva.AREA, -canva.AREA, canva.AREA, -canva.AREA)
 
             # self.Refresh(False)
             formas_selecionadas = [forma for forma in canva.layers[0].formas if forma.selecionado]

@@ -14,7 +14,7 @@ class EstadoDesenho(Estado):
         canva.CaptureMouse() 
         canva.x, canva.y = canva.lastx, canva.lasty = evt.GetPosition()
         
-        canva.x, canva.y  = getWorldCoords(canva.x, canva.y , AREA, -AREA, AREA, -AREA)
+        canva.x, canva.y  = getWorldCoords(canva.x, canva.y , canva.AREA, -canva.AREA, canva.AREA, -canva.AREA)
         print(f'MOUSEDOWN = x: {canva.x}, y:{canva.y}')
         # ! Verifica modo ativo.
         print(canva.layers[0].formas)
@@ -41,7 +41,7 @@ class EstadoDesenho(Estado):
         
         canva.lastx, canva.lasty = canva.x, canva.y
         canva.x, canva.y = evt.GetPosition()
-        canva.x, canva.y  = getWorldCoords(canva.x, canva.y , AREA, -AREA, AREA, -AREA)
+        canva.x, canva.y  = getWorldCoords(canva.x, canva.y , canva.AREA, -canva.AREA, canva.AREA, -canva.AREA)
 
         if (canva.layers[0].formas):
             canva.layers[0].formas[-1].mouseMov(canva.x, canva.y)

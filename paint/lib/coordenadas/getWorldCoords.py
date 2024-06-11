@@ -2,13 +2,11 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import numpy as np
-
 # ----------------------------------------------------- #
 # Projecao inversa de coordenadas                       #
 # ----------------------------------------------------- #
-AREA = 250
 
-def getWorldCoords(x, y, right, left, top, bottom):
+def getWorldCoords(x, y, right, left, top, bottom, AREA=250):
     """
     Transforms screen coordinates (x, y) to OpenGL world coordinates.
 
@@ -73,7 +71,7 @@ def getWorldCoords(x, y, right, left, top, bottom):
     invP = np.linalg.inv(PM)
 
     # conversão das coordenadas do mouse para NDC
-    viewport = glGetIntegerv(GL_VIEWPORT)
+    viewport = glGetIntegerv(GL_VIEWPORT) 
     ywin = viewport[3] - y
     xndc = (2*(x-viewport[0]))/viewport[2] -1
     yndc = (2*(ywin-viewport[1]))/viewport[3] -1

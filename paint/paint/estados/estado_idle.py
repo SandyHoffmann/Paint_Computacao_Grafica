@@ -9,7 +9,7 @@ class EstadoIdle(Estado):
         canva.CaptureMouse() 
         canva.x, canva.y = canva.lastx, canva.lasty = evt.GetPosition()
         
-        canva.x, canva.y  = getWorldCoords(canva.x, canva.y , AREA, -AREA, AREA, -AREA)
+        canva.x, canva.y  = getWorldCoords(canva.x, canva.y , canva.AREA, -canva.AREA, canva.AREA, -canva.AREA)
 
         canva.layers[0].formas.append(Poligono(canva.x, canva.y, canva.cor_selecionada))
         canva.estado_atual = canva.estado_desenho

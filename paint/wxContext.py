@@ -31,6 +31,8 @@ buttons = [
     {'id': wx.NewId(), 'label': '', 'pic': 'RectangleSelectToolIcon+.192.png', 'value': 'selecao+'},
     {'id': wx.NewId(), 'label': '', 'pic': 'rotate_right.png', 'value': 'rotacao'},
     {'id': wx.NewId(), 'label': '', 'pic': 'rotate_right.png', 'value': 'rotacao'},
+    {'id': wx.NewId(), 'label': '', 'pic': 'zoom.png', 'value': 'zoomin'},
+    {'id': wx.NewId(), 'label': '', 'pic': 'zoomout.png', 'value': 'zoomout'},
 
 
 ]

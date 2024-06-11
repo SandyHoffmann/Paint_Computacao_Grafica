@@ -3,7 +3,7 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from paint.layer import Layer
 from paint.formas.poligono import Poligono
-from lib.coordenadas.getWorldCoords import *
+# from lib.coordenadas.getWorldCoords import *
 from paint.estados.estado_desenho import *
 from paint.estados.estado_idle import *
 from paint.estados.estado_selecao import *
@@ -11,6 +11,7 @@ from paint.estados.estado_mover import *
 from paint.estados.estado_mover_ponto import *
 from paint.estados.estado_transformacao import *
 from paint.estados.estado_rotacao import *
+from paint.estados.estado_pan import *
 
 import re
 
@@ -19,9 +20,10 @@ right=110
 top=-10
 bottom=90
 w,h = 500, 500
-AREA = 250
 class CanvaPaint(MyCanvasBase):                
-
+    AREA = 250
+    pan_x = 0
+    pan_y = 0
     layers = [Layer()]
     estado_desenho = EstadoDesenho()
     estado_idle = EstadoIdle()
@@ -31,16 +33,20 @@ class CanvaPaint(MyCanvasBase):
     estado_mover_ponto = EstadoMoverPonto()
     estado_transformacao = EstadoTransformacao()
     estado_rotacao = EstadoRotacao()
+    estado_pan = EstadoPan()
+
     cor_selecionada = (255, 0, 0)
     def InitGL(self):
-
+        print(self.AREA)
         glutInit(sys.argv)
         glViewport(0, 0, 500, 500) # dizendo para ele ocupar a janela toda. Poderia, por exemplo, ocupar somente uma parte.
         glutInitWindowPosition(0, 0)
         glMatrixMode(GL_PROJECTION) # controla os parametros de visualizacao - camera
         glLoadIdentity() #
         #glOrtho(right, left, top, bottom, -1, 1)  # profundidade - no meu mundo eu quero ver de qual coordenada a qual coordenada? - left - right - bottom - top - se aumentar os valores diminui o zoom e se aumentar ocorre o inverso - projecao ortogonal
-        glOrtho(-AREA, AREA, -AREA, AREA, -AREA, AREA)
+        # glOrtho(-self.AREA, self.AREA, -self.AREA, self.AREA, -self.AREA, self.AREA)
+        glOrtho(-self.AREA + self.pan_x, self.AREA + self.pan_x, -self.AREA + self.pan_y, self.AREA + self.pan_y, -self.AREA, self.AREA)
+
         glMatrixMode(GL_MODELVIEW) # pilha de matrizes de modelo - faz a rotacao, translacao de objetos - move os objetos pelo mundo - operacoes de visualizacao
         glLoadIdentity() #
         # glutIdleFunc(self.OnDraw)
@@ -97,7 +103,8 @@ class CanvaPaint(MyCanvasBase):
     def setState(self, state):
         print(state)
         pattern = re.compile(r'^#')
-
+        self.pan_x = 0
+        self.pan_y = 0
         match state:
             case "poligono":
                 self.estado_atual = self.estado_desenho
@@ -123,7 +130,20 @@ class CanvaPaint(MyCanvasBase):
             case "transformacao":
                 self.estado_transformacao.inicializa_malha(self)
                 self.estado_atual = self.estado_transformacao
-            
+            case "zoomin":
+                if self.AREA > 1:
+                    self.AREA-=self.AREA/10
+                    self.Refresh(True)
+                    print("zoom")
+            case "zoomout":
+                self.AREA+=self.AREA/10
+                self.Refresh(True)
+                print("zoom-out")
+
+            case "pan":
+                self.estado_atual = self.estado_pan
+                print("pan")
+
             case _:
                 print("COLOR")
                 if state[0] == '#':

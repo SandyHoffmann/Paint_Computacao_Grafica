@@ -3,7 +3,6 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from paint.layer import Layer
 from paint.formas.poligono import Poligono
-# from lib.coordenadas.getWorldCoords import *
 from paint.estados.estado_desenho import *
 from paint.estados.estado_idle import *
 from paint.estados.estado_selecao import *
@@ -15,6 +14,8 @@ from paint.estados.estado_pan import *
 
 import re
 
+#definicao medidas iniciais
+
 left=-10
 right=110
 top=-10
@@ -22,9 +23,13 @@ bottom=90
 w,h = 500, 500
 class CanvaPaint(MyCanvasBase):                
     AREA = 250
+    # parametros para operação de pan
     pan_x = 0
     pan_y = 0
+    #definicao de layer
     layers = [Layer()]
+
+    #definicao de estados no padrão state
     estado_desenho = EstadoDesenho()
     estado_idle = EstadoIdle()
     estado_selecao = EstadoSelecao()
@@ -34,29 +39,18 @@ class CanvaPaint(MyCanvasBase):
     estado_transformacao = EstadoTransformacao()
     estado_rotacao = EstadoRotacao()
     estado_pan = EstadoPan()
-
+    #cor selecionada para desenho de formas
     cor_selecionada = (255, 0, 0)
     def InitGL(self):
-        print(self.AREA)
         glutInit(sys.argv)
         glViewport(0, 0, 500, 500) # dizendo para ele ocupar a janela toda. Poderia, por exemplo, ocupar somente uma parte.
         glutInitWindowPosition(0, 0)
         glMatrixMode(GL_PROJECTION) # controla os parametros de visualizacao - camera
         glLoadIdentity() #
-        #glOrtho(right, left, top, bottom, -1, 1)  # profundidade - no meu mundo eu quero ver de qual coordenada a qual coordenada? - left - right - bottom - top - se aumentar os valores diminui o zoom e se aumentar ocorre o inverso - projecao ortogonal
-        # glOrtho(-self.AREA, self.AREA, -self.AREA, self.AREA, -self.AREA, self.AREA)
-        glOrtho(-self.AREA + self.pan_x, self.AREA + self.pan_x, -self.AREA + self.pan_y, self.AREA + self.pan_y, -self.AREA, self.AREA)
-
+        glOrtho(-self.AREA + self.pan_x, self.AREA + self.pan_x, -self.AREA + self.pan_y, self.AREA + self.pan_y, -self.AREA, self.AREA) #ortho considerando area e pan
         glMatrixMode(GL_MODELVIEW) # pilha de matrizes de modelo - faz a rotacao, translacao de objetos - move os objetos pelo mundo - operacoes de visualizacao
         glLoadIdentity() #
-        # glutIdleFunc(self.OnDraw)
-        # funcao motion (drag)
-        # glutMotionFunc(self.OnMouseMotion)
-        # funcao click
-        # glutMouseFunc(self.OnMouseDown)
-        # glEnable(GL_DEPTH_TEST)
-        # glEnable(GL_LIGHTING)
-        # glEnable(GL_LIGHT0)
+    
 
     def showScreen():
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -67,12 +61,14 @@ class CanvaPaint(MyCanvasBase):
         # glutPostRedisplay()
         glLoadIdentity()
 
+    #funcoes onMouseDown e onMouseMotion padrões para cada state
     def OnMouseDown(self, evt):
         self.estado_atual.OnMouseDown(self,evt)
 
     def OnMouseMotion(self, evt):
         self.estado_atual.OnMouseMotion(self,evt)
             
+    #funcao para desenho (tbm leva em conta ondraw dos estados)
     def OnDraw(self):
         # clear color and depth buffers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -83,23 +79,14 @@ class CanvaPaint(MyCanvasBase):
         self.InitGL()
 
         glLoadIdentity()
-    
-        # ? desenho do eixo x com comprimento 40
-        glColor3f(1.0, 0.0, 0.0) # definir a cor vermelha
-        glBegin(GL_LINES) # tipo de primitiva que eu quero
-        glVertex2f(-20.0, 0.0) # passar as coordenadas de um dos vertices
-        glVertex2f(20.0, 0.0) # passar as coordenadas do outro vertice
-        glEnd()
-
-        # ! Desenhando formas
+        # desenhando as formas com seu metodo padrão
         for layer in self.layers:
             for forma in layer.formas:
                 forma.draw()
        
-        # glRotatef((self.x - self.lastx) * xScale, 0.0, 1.0, 0.0);
         self.estado_atual.OnDraw(self)
         self.SwapBuffers()
-
+    # definicao dos states,mudando estado atual
     def setState(self, state):
         print(state)
         pattern = re.compile(r'^#')
@@ -107,7 +94,7 @@ class CanvaPaint(MyCanvasBase):
         self.pan_y = 0
         match state:
             case "poligono":
-                self.estado_atual = self.estado_desenho
+                self.estado_atual = self.estado_idle
             case "idle":
                 self.estado_atual = self.estado_idle
             case "selecao":
@@ -115,7 +102,7 @@ class CanvaPaint(MyCanvasBase):
             case "mover":
                 self.estado_atual = self.estado_mover
             case "deletar":
-                #implementar deletar
+                #deletando todas as formas selecionadas
                 for layer in self.layers:
                     novasFormas = []
                     for forma in layer.formas:
@@ -126,6 +113,7 @@ class CanvaPaint(MyCanvasBase):
             case "mover_ponto":
                 self.estado_atual = self.estado_mover_ponto
             case "rotacao":
+                self.estado_rotacao.forma_original = False
                 self.estado_atual = self.estado_rotacao
             case "transformacao":
                 self.estado_transformacao.inicializa_malha(self)
@@ -143,9 +131,14 @@ class CanvaPaint(MyCanvasBase):
             case "pan":
                 self.estado_atual = self.estado_pan
                 print("pan")
-
+            case "size":
+                print("size")
+                for layer in self.layers:
+                    for forma in layer.formas:
+                        forma.calcularArea()
             case _:
                 print("COLOR")
+                # cor ja vem no padrão de hexadecimais, entao so é necessário coloca-lo na cor do estado de desenho
                 if state[0] == '#':
                     print(state[1:3], state[3:5], state[5:7])
                     self.cor_selecionada = (int(state[1:3], 16), int(state[3:5], 16), int(state[5:7], 16)) 

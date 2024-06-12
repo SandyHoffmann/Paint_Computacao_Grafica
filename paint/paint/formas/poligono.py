@@ -1,11 +1,12 @@
 from paint.forma import Forma
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-
+import math
+#estado de poligono (pode ser feito qualquer poligono, como quadrados, retangulos, triangulos etc)
 class Poligono(Forma):
 
     def __init__(self, x, y, cor_selecionada = (255, 0.0, 0.0)):
-        super().__init__(x, y)  # Call the parent class constructor
+        super().__init__(x, y)  
         self.pontos = [(x, y)]
         self.pontoTemporario=False
         self.baricentro = False
@@ -17,10 +18,32 @@ class Poligono(Forma):
     def mouseMov(self, x, y):
         self.pontoTemporario = (x,y)
     
+    # calcula o area do poligono e o perimetro
+    def calcularArea(self):
+        n = len(self.pontos)
+        # minimo de 3 pontos
+        if n < 3:
+            return 0  
+        
+        area = 0
+        perimetro = 0
+        for i in range(n):
+            x1, y1 = self.pontos[i]
+            x2, y2 = self.pontos[(i + 1) % n]
+            distancia = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+            perimetro += distancia
+
+            area += x1 * y2 - y1 * x2
+        area = abs(area) / 2.0
+        print(f'area = {round(area, 2)}')
+        print(f'perimetro = {round(perimetro, 2)}')
+        return area
+
+
     def setPontoTemporario(self):
         self.pontoTemporario = False
         self.calculaBaricentro()
-
+    # calculo para calcular baricentro do poligono
     def calculaBaricentro(self):
         qtdPontos = len(self.pontos)
         if (qtdPontos > 0):
@@ -32,20 +55,17 @@ class Poligono(Forma):
 
             self.baricentro = (xb/qtdPontos, yb/qtdPontos)
 
+
     def move(self, pMouse):
-        # novosPontos = []
-        # for ponto in self.pontos:
-        #     dif = (ponto[0] + pMouse[0], ponto[1] + pMouse[1] )
-        #     print(f'dif = {dif}')
-        #     print(f'ponto = {ponto}')
-        #     novosPontos.append((dif[0], dif[1]))
-        # self.pontos = novosPontos
+       
         novosPontos = []
         dif = (pMouse[0] - self.baricentro[0], pMouse[1] - self.baricentro[1] )
         for ponto in self.pontos:
             novosPontos.append((ponto[0] + dif[0] , ponto[1] + dif[1]))
         self.pontos = novosPontos
         self.baricentro = (pMouse[0], pMouse[1])
+
+    # desenha o poligono, se completo fechado, se ainda em temporario ira ter uma corda que facilita ao usuario continuar o desenho
     def draw(self):
         
         glLineWidth(2)

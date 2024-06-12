@@ -2,9 +2,9 @@ from paint.estados.estado import *
 from paint.formas.poligono import *
 from lib.coordenadas.getWorldCoords import *
 
-
+# estado idle, para esperar o usuario ir para outro estado
 class EstadoIdle(Estado):
-
+    #quando usuario clica vai para o estado desenho
     def OnMouseDown(self, canva, evt):
         canva.CaptureMouse() 
         canva.x, canva.y = canva.lastx, canva.lasty = evt.GetPosition()

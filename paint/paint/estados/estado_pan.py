@@ -4,8 +4,9 @@ from paint.formas.poligono import Poligono
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 import numpy as np
-class EstadoPan(Estado):
 
+# estado para visualizacao do tipo pan
+class EstadoPan(Estado):
 
     def __init__(self) -> None:
         super().__init__()
@@ -17,6 +18,7 @@ class EstadoPan(Estado):
     def OnDraw(self, canva):
         pass
 
+    #guarda ultima movimentacao do mouse
     def OnMouseDown(self, canva, evt):
         canva.CaptureMouse() 
 
@@ -25,7 +27,7 @@ class EstadoPan(Estado):
         self.is_panning = True
         self.last_mouse_x = canva.x
         self.last_mouse_y = canva.y
-
+    # compara ultima movimentacao com movimentacao atual e arrasta o campo de visao (é resetado quando sai do modo pan)
     def OnMouseMotion(self, canva, evt): 
         if self.is_panning:
             dx = evt.x - self.last_mouse_x

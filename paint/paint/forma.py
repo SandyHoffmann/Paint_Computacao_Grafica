@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+# Forma abstrata para ser implementada a cada forma
 class Forma(ABC):
     def __init__(self, x, y):
         self.x = x
@@ -12,7 +13,6 @@ class Forma(ABC):
         self.baricentro = (0,0)
 
     def set_selecionado(self):
-        print("set_selecionado")
         self.selecionado = not self.selecionado
 
     def set_color_linha(self, color):
@@ -37,4 +37,8 @@ class Forma(ABC):
 
     @abstractmethod
     def setPontoTemporario(self):
+        pass
+
+    @abstractmethod
+    def calcularArea(self):
         pass

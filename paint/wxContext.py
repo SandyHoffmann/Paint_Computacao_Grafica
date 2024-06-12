@@ -1,6 +1,5 @@
 import wx
 import sys
-from windowPaint import WindowPaint
 from paint.canva import CanvaPaint
 try:
     from wx import glcanvas
@@ -20,6 +19,7 @@ except ImportError:
 w=700
 h=900
 
+# definições botões comuns a barra de icones
 buttons = [
     {'id': wx.NewId(), 'label': '', 'pic': 'LineToolIcon.192.png', 'value': 'poligono'},
     {'id': wx.NewId(), 'label': '', 'pic': 'RectangleSelectToolIcon.192.png', 'value': 'selecao'},
@@ -30,13 +30,12 @@ buttons = [
     {'id': wx.NewId(), 'label': '', 'pic': 'IconFourWayArrow.png', 'value': 'transformacao'},
     {'id': wx.NewId(), 'label': '', 'pic': 'RectangleSelectToolIcon+.192.png', 'value': 'selecao+'},
     {'id': wx.NewId(), 'label': '', 'pic': 'rotate_right.png', 'value': 'rotacao'},
-    {'id': wx.NewId(), 'label': '', 'pic': 'rotate_right.png', 'value': 'rotacao'},
+    {'id': wx.NewId(), 'label': '', 'pic': 'size.png', 'value': 'size'},
     {'id': wx.NewId(), 'label': '', 'pic': 'zoom.png', 'value': 'zoomin'},
     {'id': wx.NewId(), 'label': '', 'pic': 'zoomout.png', 'value': 'zoomout'},
-
-
 ]
 
+# botoes de cores
 buttonsColors = [
     {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#ff0000', 'wxValue': wx.RED},
     {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#0000ff', 'wxValue': wx.BLUE},
@@ -52,56 +51,46 @@ buttonsColors = [
     {'id': wx.NewId(), 'label': '', 'pic': '', 'value': '#000000',  'wxValue': wx.BLACK},
 
 ]
-
-buttonDefs = {
-    wx.NewId() : ('Poligono',      'P'),
-    wx.NewId() : ('ConeCanvas',      'C'),
-     wx.NewId() : ('Poligono',      'A'),
-    wx.NewId() : ('ConeCanvas',      'B'),
-    }
-
+# classe da biblioteca grafica de botoes wxPython
 class ButtonPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent, -1)
-        # appOpenGL=appOpenGL
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH) 
         box = wx.BoxSizer(wx.VERTICAL)
-        
-        #add background color to the box
-        
-
+        # colocando background de fundo do editor roxo
         self.SetBackgroundColour((220,50,255))
-
+        
+        #criando estruturação de caixas para os botoões no lado esquerdo
         boxAbsolute = wx.BoxSizer(wx.HORIZONTAL)
-
         box.Add((40, 40))
-        keys = buttonDefs.keys()
+
+        #para fazer botoes ficarem de 2 em dois é criado uma caixa a cada 2 botoes e adicionado ao menu lateral
         caixaAtiva = wx.BoxSizer(wx.HORIZONTAL)
 
         alinhamento = 1
         for b in buttons:
-            # text = buttonDefs[k][1]
+            #bitmap para colocar o background image do botao
             pic = wx.Bitmap(f'paint/paint/images/{b["pic"]}')
             pic = pic.ConvertToImage().Scale(20, 20).ConvertToBitmap()
-            # pic.SetSize((30, 30))
-            # btn = wx.BitmapButton(self, k, pic, pos=(0,0), size=(30,30))
             btn = wx.BitmapButton(self, b["id"], size=(35,35), style=wx.BU_AUTODRAW)
-            #btn.SetBackgroundColour('RED')
             btn.SetBitmap(pic,wx.LEFT)
             btn.SetWindowStyleFlag(wx.BORDER_DOUBLE)
             caixaAtiva.Add(btn, 0, wx.ALIGN_CENTER)
+            # logica para que só tenha dois botoes por linha
             if (alinhamento % 2 == 0):
                 box.Add(caixaAtiva, 0, wx.ALIGN_LEFT|wx.ALL, 3)
                 caixaAtiva = wx.BoxSizer(wx.HORIZONTAL)
 
             alinhamento+=1
-            
+            # o bind é responsavel por atribuir o comportamento de click ao botao
             self.Bind(wx.EVT_BUTTON, self.OnButton, btn)
 
+        # a mesma coisa é feita com o box de cores
         caixaColors = wx.BoxSizer(wx.HORIZONTAL)
         for b in buttonsColors:
             btn = wx.Button(self, b["id"], size=(35,35), style=wx.BU_AUTODRAW)
             btn.SetWindowStyleFlag(wx.BORDER_DOUBLE)
+            # unica diferenca é que ao inves de bitmaps tem cores.
             btn.SetBackgroundColour(b["wxValue"])
             self.Bind(wx.EVT_BUTTON, self.OnButton, btn)
             caixaColors.Add(btn, 0, wx.ALIGN_CENTER)
@@ -110,12 +99,11 @@ class ButtonPanel(wx.Panel):
                 caixaColors = wx.BoxSizer(wx.HORIZONTAL)
 
             alinhamento+=1
-
-        # With this enabled, you see how you can put a GLCanvas on the wx.Panel
         
         boxAbsolute.Add(box, 0, wx.ALIGN_LEFT)
         boxAbsolute.Add(caixaColors, 0, wx.ALIGN_LEFT)
 
+        # colocando o canva paint no frame dentro da interface grafica do wxpython
         self.c = CanvaPaint(self)
         self.c.SetMinSize((500, 500))
         boxAbsolute.Add(self.c, 0, wx.ALIGN_LEFT|wx.ALL, 15)
@@ -123,6 +111,7 @@ class ButtonPanel(wx.Panel):
         self.SetAutoLayout(True)
         self.SetSizer(boxAbsolute)
 
+    #evento do botao
     def OnButton(self, evt):
         if not haveGLCanvas:
             dlg = wx.MessageDialog(self,
@@ -140,22 +129,13 @@ class ButtonPanel(wx.Panel):
             dlg.Destroy()
 
         else:
+            # pegando evento de click do botão e mandando valor para o state do canva
             canvasClassName = list(filter(lambda x: x['id'] == evt.GetId(), buttons))
             if len(canvasClassName) == 0:
                 canvasClassName = list(filter(lambda x: x['id'] == evt.GetId(), buttonsColors))
             self.c.setState(canvasClassName[0]["value"])
-            # canvasClass = eval(canvasClassName)
-            # cx = 0
-            # if canvasClassName == 'ConeCanvas': cx = 400
-            # frame = wx.Frame(None, -1, canvasClassName, size=(400,400), pos=(cx,400))
 
-
-
-            # canvasClass(frame) # CubeCanvas(frame) or ConeCanvas(frame); frame passed to MyCanvasBase
-            # frame.Show(True)
-
-
-
+#configurações do wxpython
 class RunDemoApp(wx.App):
     global w,x
     def __init__(self):

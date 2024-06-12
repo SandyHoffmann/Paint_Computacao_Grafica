@@ -4,6 +4,8 @@ from lib.coordenadas.getWorldCoords import *
 import sys
 
 """
+Estado para selecionar poligonos
+
 Utilizando o Ray Casting Algorithm
 Fonte: https://rosettacode.org/wiki/Ray-casting_algorithm
 """
@@ -17,6 +19,8 @@ class EstadoSelecao(Estado):
         
         c = 0
         d = 0
+
+        # utilizando o algoritmo de Ray Casting, formas selecionadas sao indicadas e mandadas ao canva
 
         for i in range(len(canva.layers[0].formas)):
             forma_atual = canva.layers[0].formas[i]

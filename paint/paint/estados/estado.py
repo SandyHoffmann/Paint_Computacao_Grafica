@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-
+# classe abstrata de estado
 class Estado(ABC):
     @abstractmethod
     def OnMouseDown(self, evt):

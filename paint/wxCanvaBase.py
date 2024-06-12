@@ -10,7 +10,6 @@ except ImportError:
 
 """
 MyCanvasBase representa a base para ligação das funcionalidades com a biblioteca do wxPython
-Seus métodos devem ser implementados pelas classes filhas
 """
 class MyCanvasBase(glcanvas.GLCanvas):
 
@@ -23,6 +22,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.lastx = self.x = 30
         self.lasty = self.y = 30
         self.size = None
+        # bind events 
         self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
@@ -30,6 +30,8 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseDown)
         self.Bind(wx.EVT_LEFT_UP, self.OnMouseUp)
         self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
+
+    # funcoes vão ser implementadas nas classes filhas
 
     def OnEraseBackground(self, event):
         pass # Do nothing, to avoid flashing on MSW.
@@ -40,16 +42,10 @@ class MyCanvasBase(glcanvas.GLCanvas):
 
     def DoSetViewport(self):
         pass
-        # size = self.size = self.GetClientSize()
-        # self.SetCurrent(self.context)
-        # glViewport(0, 0, 500, 500)
         
     def OnPaint(self, event):
         dc = wx.PaintDC(self)
         self.SetCurrent(self.context)
-        # if not self.init:
-        #     self.InitGL()
-        #     self.init = True
         self.OnDraw()
 
     def OnMouseDown(self, evt):
@@ -66,7 +62,4 @@ class MyCanvasBase(glcanvas.GLCanvas):
     
     def OnMouseMotion(self, evt):
         pass
-        # if evt.Dragging() and evt.LeftIsDown():
-        #     self.lastx, self.lasty = self.x, self.y
-        #     self.x, self.y = evt.GetPosition()
-        #     self.Refresh(False)
+   

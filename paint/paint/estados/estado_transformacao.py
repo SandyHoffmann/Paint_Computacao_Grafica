@@ -15,6 +15,7 @@ class EstadoTransformacao(Estado):
         self.ponto_selecionado = None
         self.posicao_inicial = None
     def inicializa_malha(self,canva):
+        # montando malha de seleção para as formas selecionadas
         self.formas = []
 
         min_y = 0
@@ -23,7 +24,6 @@ class EstadoTransformacao(Estado):
         max_x = 0
         
         formas_selecionadas = [forma.pontos for forma in canva.layers[0].formas if forma.selecionado]
-        print("formas_selecionadas = ", formas_selecionadas)
         for forma in formas_selecionadas:
             pontos_x = [ponto[0] for ponto in forma]
             pontos_y = [ponto[1] for ponto in forma]
@@ -38,15 +38,12 @@ class EstadoTransformacao(Estado):
 
             novo_poligono = Poligono(min_x, min_y)
             novo_poligono.pontos = self.malha_pontos_selecao
-            # canva.layers[0].formas.append(novo_poligono)
-            # canva.layers[0].formas[-1].draw()
-
             self.formas.append(novo_poligono)
 
-        print("min_x = ", min_x, "max_x = ", max_x, "min_y = ", min_y, "max_y = ", max_y)
         canva.Refresh(True)
 
     def OnDraw(self, canva):
+        # desenhando forma e pontos
         for forma in self.formas:
             forma.draw()
         
@@ -64,7 +61,7 @@ class EstadoTransformacao(Estado):
         canva.x, canva.y  = getWorldCoords(canva.x, canva.y , canva.AREA, -canva.AREA, canva.AREA, -canva.AREA)
 
         margem_erro = 5
-
+        # um dos pontos do retangulo necessita ser selecionado primeiro pra que ocorra a transformacao
         for i_forma in range(len(self.formas)):
             for i_ponto in range(len(self.formas[i_forma].pontos)):
                 if (
@@ -72,7 +69,6 @@ class EstadoTransformacao(Estado):
                     and 
                     self.formas[i_forma].pontos[i_ponto][1] >= (canva.y - margem_erro) and self.formas[i_forma].pontos[i_ponto][1] <= (canva.y + margem_erro) 
                     ):
-                    print("ponto selecionado = ", self.formas[i_forma].pontos[i_ponto])
                     self.ponto_selecionado = [i_forma,i_ponto]
                     self.posicao_inicial = [canva.x, canva.y]
                     canva.Refresh(True)
@@ -83,19 +79,13 @@ class EstadoTransformacao(Estado):
             self.malha_inicializada = True
             
         if evt.Dragging() and evt.LeftIsDown():
-            print("canva.x = ", canva.x, "canva.y = ", canva.y)
-            print("ponto selecionado = ", self.ponto_selecionado)
             if self.ponto_selecionado == None:
                 return
-            print("posicao_inicial = ", self.posicao_inicial)
 
             i_forma, _ = self.ponto_selecionado
             forma =  [forma for forma in canva.layers[0].formas if forma.selecionado][i_forma]
 
-            # largura = self.formas[i_forma].pontos[2][0] - self.formas[i_forma].pontos[0][0]
-            # altura = self.formas[i_forma].pontos[2][1] - self.formas[i_forma].pontos[0][1]
-
-            # Calculate centroid
+            # Calculando centro
             centroid = np.mean(forma.pontos, axis=0)
 
             largura = self.posicao_inicial[0] - centroid[0]
@@ -108,21 +98,21 @@ class EstadoTransformacao(Estado):
              
             escalar_largura = (largura+dx)/largura 
             escalar_altura = (altura+dy)/altura
-            # Calculate the distance the mouse has moved
+            # calculando distancia que o mouse moveu
             dist_moved = np.sqrt(dx**2 + dy**2)
             
-            # Determine the scale factor based on the distance moved
+            # Ver se houve movimento
             if dist_moved == 0:
                 return
 
-            # Scale the polygon
+            # Transformando o poligono
             scaled_pontos = []
             for x, y in forma.pontos:
                 
                 new_x = centroid[0] + escalar_largura * (x - centroid[0])
                 new_y = centroid[1] + escalar_altura * (y - centroid[1])
                 scaled_pontos.append((new_x, new_y))
-            print("scaled_pontos = ", scaled_pontos)
+
             forma.pontos = scaled_pontos
             self.posicao_inicial = [canva.x, canva.y]
             self.inicializa_malha(canva)
